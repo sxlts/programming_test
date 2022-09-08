@@ -1,0 +1,25 @@
+Model Input
+
+Brand_Factor = Values ranging from (0.1 -> 2.9)
+
+Model Run (run for 15 years, in 1 year increments)
+
+Age = Age + 1
+If (Auto_Renew) { 
+    // Do nothing, maintain Breed
+} else {
+    double rand = Math.random() * 3;
+    Affinity = Payment_at_Purchase/Attribute_Price + (rand * Attribute_Promotions * Inertia_for_Switch)
+    If (Breed == Breed_C && Affinity < (Social_Grade * Attribute_Brand))
+        Switch Breed to Breed_NC
+    Else if (Breed == Breed_NC && Affinity < (Social_Grade * Attribute_Brand * Brand_Factor))
+        Switch Breed to Breed_C
+}
+
+Model Output (Values for every year, and final)
+
+Breed_C Agents
+Breed_NC Agents
+Breed_C Lost (Switched to Breed_NC)
+Breed_C Gained (Switch from Breed_NC)<
+Breed_C Regained (Switched to NC, then back to C)
