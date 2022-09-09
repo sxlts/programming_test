@@ -6,7 +6,7 @@ I used linux environment to build this project.
 
 To build do:
 ```bash
-$ cmake.
+$ cmake .
 $ make
 ```
 
