@@ -3,8 +3,8 @@
 #include <string.h>
 #include <vector>
 
-int years;
-int Brand_Factor;
+int years = 15;
+int Brand_Factor = 1.5;
 int outputValuesNumber = 5;
 
 struct Data
@@ -27,7 +27,7 @@ void ProcessData(Data & data, std::vector<std::vector<int>> * modelOutput) {
         int previousBreed = data.Agent_Breed;
         if (!data.Auto_Renew)
         {
-            double randNumber = rand()/RAND_MAX * 3.0;
+            double randNumber = (double)rand() / (double)RAND_MAX * 3.0;
             double Affinity = data.Payment_at_Purchase / data.Attribute_Price + (randNumber * data.Attribute_Promotions * data.Inertia_for_Switch);
             if (data.Agent_Breed == 0 && Affinity < (data.Social_Grade * data.Attribute_Brand))
                 data.Agent_Breed = 1;
