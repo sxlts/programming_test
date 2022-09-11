@@ -3,9 +3,9 @@
 #include <string.h>
 #include <vector>
 
-int years = 15;
+int const years = 15;
 double Brand_Factor = 1.5;
-int outputValuesNumber = 5;
+int const outputValuesNumber = 5;
 
 struct Data
 {
@@ -21,43 +21,46 @@ struct Data
     float Attribute_Promotions;
 };
 
-void ProcessData(Data & data, std::vector<std::vector<int>> * modelOutput) {
+void ProcessData(Data & data, int modelOutput[years][outputValuesNumber]) {
     int originalBreed = data.Agent_Breed;
-    for (int i = 0; i < years; ++i) {
+    for (int year = 0; year < years; ++year) {
+        if (data.Auto_Renew)
+            continue;
+
         int previousBreed = data.Agent_Breed;
-        if (!data.Auto_Renew)
-        {
-            double randNumber = (double)rand() / (double)RAND_MAX * 3.0;
-            double Affinity = (double)data.Payment_at_Purchase / data.Attribute_Price + (randNumber * data.Attribute_Promotions * (double)data.Inertia_for_Switch);
-            if (data.Agent_Breed == 0 && Affinity < ((double)data.Social_Grade * data.Attribute_Brand))
-                data.Agent_Breed = 1;
-            else if (data.Agent_Breed == 1 && Affinity < ((double)data.Social_Grade * data.Attribute_Brand * Brand_Factor)) 
-                data.Agent_Breed = 0;
-        }
+
+        double randNumber = (double)rand() / (double)RAND_MAX * 3.0;
+        double Affinity = (double)data.Payment_at_Purchase / data.Attribute_Price + 
+            (randNumber * data.Attribute_Promotions * (double)data.Inertia_for_Switch);
+        if (data.Agent_Breed == 0 && Affinity < ((double)data.Social_Grade * data.Attribute_Brand))
+            data.Agent_Breed = 1;
+        else if (data.Agent_Breed == 1 && Affinity < ((double)data.Social_Grade * data.Attribute_Brand * Brand_Factor)) 
+            data.Agent_Breed = 0;
+
         if (data.Agent_Breed == 0) // Breed_C Agents
-            ++(*modelOutput)[i][0];
-        if (data.Agent_Breed == 1) // Breed_NC Agents
-            ++(*modelOutput)[i][1];
+            ++(modelOutput)[year][0];
+        else                       // Breed_NC Agents
+            ++(modelOutput)[year][1];
+
         if (previousBreed == 0 && data.Agent_Breed == 1) // Breed_C Lost (Switched to Breed_NC)
-            ++(*modelOutput)[i][2];
+            ++(modelOutput)[year][2];
         if (previousBreed == 1 && data.Agent_Breed == 0) // Breed_C Gained (Switch from Breed_NC)
-            ++(*modelOutput)[i][3];
+            ++(modelOutput)[year][3];
+
         if (originalBreed == 0 && previousBreed == 1 && data.Agent_Breed == 0) // Breed_C Regained (Switched to NC, then back to C)
-            ++(*modelOutput)[i][4];
+            ++(modelOutput)[year][4];
     }
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     srand((unsigned)time(NULL));
     
-    if (argc < 3) {
+    if (argc < 2) {
         std::cout << "give Brand_Factor and years value!\n";
         return 1;
     }
 
     Brand_Factor = atof(argv[1]);
-    years = atoi(argv[2]);
 
     FILE * fin = fopen("PseudoData.csv", "r");
     if (!fin) {
@@ -67,7 +70,7 @@ int main(int argc, char** argv)
 
     fscanf(fin, "%*s"); // skip first line of .csv
 
-    std::vector<std::vector<int>> modelOutput (years, std::vector<int>(outputValuesNumber, 0)); // zero-initialized matrix for output
+    int modelOutput[years][outputValuesNumber] = {0};
 
     Data data;
     char Agent_Breed[20];
@@ -78,7 +81,7 @@ int main(int argc, char** argv)
     {
         if (strcmp(Agent_Breed, "Breed_NC") == 0)
             data.Agent_Breed = 1; // we assume that there are only two options and Breed_C is default
-        ProcessData(data, &modelOutput);
+        ProcessData(data, modelOutput);
     }
     fclose(fin);
 
