@@ -4,7 +4,7 @@
 #include <vector>
 
 int years = 15;
-int Brand_Factor = 1.5;
+double Brand_Factor = 1.5;
 int outputValuesNumber = 5;
 
 struct Data
@@ -28,10 +28,10 @@ void ProcessData(Data & data, std::vector<std::vector<int>> * modelOutput) {
         if (!data.Auto_Renew)
         {
             double randNumber = (double)rand() / (double)RAND_MAX * 3.0;
-            double Affinity = data.Payment_at_Purchase / data.Attribute_Price + (randNumber * data.Attribute_Promotions * data.Inertia_for_Switch);
-            if (data.Agent_Breed == 0 && Affinity < (data.Social_Grade * data.Attribute_Brand))
+            double Affinity = (double)data.Payment_at_Purchase / data.Attribute_Price + (randNumber * data.Attribute_Promotions * (double)data.Inertia_for_Switch);
+            if (data.Agent_Breed == 0 && Affinity < ((double)data.Social_Grade * data.Attribute_Brand))
                 data.Agent_Breed = 1;
-            else if (data.Agent_Breed == 1 && Affinity < (data.Social_Grade * data.Attribute_Brand * Brand_Factor)) 
+            else if (data.Agent_Breed == 1 && Affinity < ((double)data.Social_Grade * data.Attribute_Brand * Brand_Factor)) 
                 data.Agent_Breed = 0;
         }
         if (data.Agent_Breed == 0) // Breed_C Agents
